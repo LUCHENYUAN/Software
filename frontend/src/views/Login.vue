@@ -72,12 +72,16 @@
             // headers:{
             //   'Access-Control-Allow-Origin':'*'
             // }
-        }).then(function(res){
+        }).then((res)=>{
           global_.username=self.username;
-          console.log(global_.username);
           global_.token=res.data.result.token;
           global_.loginStatus=true;
           //console.log("Login Page: "+global_.token);
+
+          localStorage.setItem('token', res.data.result.token);
+          localStorage.setItem('username', self.username);
+          localStorage.setItem('loginStatus', true);
+
           self.startDivi();
         }).catch(function(error){
           console.log("nmdwsm");

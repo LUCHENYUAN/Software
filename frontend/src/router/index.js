@@ -8,31 +8,31 @@ Vue.use(VueRouter)
   {
     path: '/',
     name: 'Home',
-    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站',},
+    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站', },
     component: Home
   },
   {
     path: '/calendar',
     name: 'Calendar',
-    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站',},
+    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站', },
     component: () => import('../views/Calendar.vue')
   },
   {
     path: '/subscribe',
     name: 'Subscribe',
-    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站',},
+    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站', },
     component: () => import('../views/Subscribe.vue')
   },
   {
     path: '/discussion',
     name: 'Discussion',
-    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站',},
+    meta:{title: 'Let\'s code - 算法竞赛开赛提醒聚合站', },
     component: () => import('../views/Discussion.vue')
   },
   {
     path: '/register',
     name: 'Register',
-    meta:{title: '注册 - Let\'s code - 算法竞赛开赛提醒聚合站',},
+    meta:{title: '注册 - Let\'s code - 算法竞赛开赛提醒聚合站', },
     component: () => import('../views/Register.vue')
   },
   {
@@ -84,7 +84,26 @@ Vue.use(VueRouter)
 ]
 
 const router = new VueRouter({
+  mode: "history",
   routes
+})
+
+router.beforeEach((to, from, next)=>{
+  console.log("Check router");
+  const token =localStorage.getItem('token');
+  if ((to.path === '/login')||(to.path === '/register')) {
+    if (token) {
+      next('/')
+      return
+    }
+    next()
+    return
+  }
+  if (!token) {
+    next('/login')
+    return
+  }
+  next()
 })
 
 export default router

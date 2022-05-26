@@ -3,6 +3,7 @@ import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.less'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
@@ -17,27 +18,8 @@ new Vue({
   components: { App },
   template: '<App/>',
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')
 
-/*import Vuex from 'vuex'
-Vue.use(Vuex)
-const state={
-  token:"",
-  User:""
-}
-
-const mutations={
-  settoken(state,token){
-    state.token=token;
-  },
-  setuser(state,user){
-    state.user=user
-  }
-}
-
-export default new Vuex.Store({
-  state,
-  mutations,
-})*/
 

@@ -16,6 +16,11 @@
 牛客网题库中包含几万道题目，主要通过第三方购买和 UGC 的方式获得，牛客网先后尝试了直播和录播课，内容覆盖笔试题解析、面试技巧和机器学习等。</p>
     </a-card>
     <br />
+    <a-card title="AtCoder" style="width: 800px; background:#ECECEC;">
+      <a slot="extra" href="#"><a-icon key="pushpin" type="pushpin" /></a>
+      <p id="left">AtCoder是日本最大的算法竞技网站，正式创立于2012年6月20日，由AtCoder Inc.运行并维护，提供编程在线比赛、过往比赛提交、在线评测等服务。</p>
+    </a-card>
+    <br />
     <a-card title="CodeForces" style="width: 800px;background:#ECECEC;">
       <a slot="extra" href="#"><a-icon key="pushpin" type="pushpin" /></a>
       <p id="left">Codeforces是一家为计算机编程爱好者提供在线评测系统的俄罗斯网站。该网站由萨拉托夫国立大学的一个团体创立并负责运营。</p>

@@ -7,12 +7,19 @@
       <a-switch default-checked @change="onChangeReserve"></a-switch>
       <a-badge color="#2aa8ec" text="已订阅"/>
       <a-switch default-checked @change="onChangeSubscribe"></a-switch>
+      <a-badge color="#993399" text="推荐赛事"/>
+      <a-switch default-checked @change="onChangeRecommend"></a-switch>
       <a-badge color="white" text="其他可用赛事"/>
       <a-switch default-checked @change="onChangeNormal"></a-switch>
       </span>
+    </li>
+    <li>
       <span class="lengthChoice">
         比赛时长：
-        <a-select default-value="1hr" style="width: 120px" @change="handleChangeLength">
+        <a-select default-value="all" style="width: 120px" @change="handleChangeLength">
+          <a-select-option value="all">
+          所有
+          </a-select-option>
           <a-select-option value="1hr">
           小于1小时
           </a-select-option>
@@ -32,7 +39,10 @@
       </span>
       <span class="DiffChoice">
         比赛难度：
-        <a-select default-value="easy" style="width: 120px" @change="handleChangeDiff">
+        <a-select default-value="all" style="width: 120px" @change="handleChangeDiff">
+          <a-select-option value="all">
+          所有
+          </a-select-option>
           <a-select-option value="easy">
           简单
           </a-select-option>
@@ -106,24 +116,56 @@
 
 <script>
 import moment from 'moment';
+import Vue from 'vue'
 export default {
   data() {
     return {
-      needType: ['Reserve', 'Subscribe', 'Normal'],
-       matches:[],
+      token: 0,
+      needType: ['Reserve', 'Subscribe', 'Normal', 'Recommend'],
+      matches:[],
+      subscribes:[],
+      reserves:[],
       visible: false,
       modal_visible: false,
     }
   },
   //接口
-  /*mounted:function(){
-      this.$http.get('http://127.0.0.1:5000/game/all').then((response)=>{
-        console.log(response.data);
+  mounted:function(){
+      //debug，输出当前用户名，从localStroage里拿
+      this.token = localStorage.getItem('token');
+      console.log(this.token);
+      //获取全部比赛信息真正接口
+      Vue.axios.get('http://127.0.0.1:5000/game/all').then((response)=>{
+        //console.log(response.data);
         this.matches=response.data;
       }).catch((response)=>{
         console.log(response);
-      })
-    },*/
+      });
+      /*
+      //获取当前用户的订阅信息
+      Vue.axios.get('http://127.0.0.1:5000/subscribe/id').then((response)=>{
+        //console.log(response.data);
+        this.subscribes=response.data;
+      });//.catch((response)=>{
+        //console.log(response); 
+      //});
+      
+      //获取当前用户的预约信息
+      Vue.axios.get('http://127.0.0.1:5000/reserve/username').then()((response)=>{
+        this.reserves=response.data;
+      }).catch((response)=>{
+        console.log(response);
+      });
+      */
+     /*
+     Vue.axios.get('http://127.0.0.1:4523/mock/1025901/reserve/id').then((response)=>{
+        this.reserves=response.data;
+        console.log(this.reserves);
+      }).catch((response)=>{
+        console.log(response);
+      });
+      */
+    },
   methods: {
     moment,
     hide() {
@@ -168,8 +210,21 @@ export default {
         console.log(this.needType);
       }
     },
+    onChangeRecommend() {
+      let label = this.needType.indexOf('Recommend');
+      if (label != -1) {
+        this.needType.splice(label, 1);
+        console.log('Recommend Deleted from needType!');
+        console.log(this.needType);
+      }
+      else {
+        this.needType.push('Recommend');
+        console.log('Recommend Added to needType!');
+        console.log(this.needType);
+      }
+    },
     ReserveGame(){
-
+      
     },
     ReserveGameCancel() {
 
@@ -182,7 +237,7 @@ export default {
     },
     getListData(value) {
       let listData = [];
-      console.log(this.matches);
+      //console.log(this.matches);
       let acquireData = [
         {game_id: 1, game_name:"「WHOI」Round 1", platform:"洛谷", game_start_time:"2022-05-15 14:00:00", game_end_time:"2022-05-15 18:00:00", duration:"", website:"https://www.luogu.com.cn/contest/67377", type:"Reserve"},
         {game_id: 2, game_name:"【LGR-109】洛谷 5 月月赛 II & Windy Round 6", platform:"洛谷", game_start_time:"2022-05-14 14:00:00", game_end_time:"2022-05-14 18:00:00", duration:"", website:"https://www.luogu.com.cn/contest/68326", type:"Subscribe"},
@@ -224,7 +279,7 @@ export default {
         }
       }
       });
-      console.log(listData);
+      //console.log(listData);
       return listData;
     },
     
@@ -277,6 +332,11 @@ li {
 .Subscribe{
   background-color:#2aa8ec;
   border-color: #2aa8ec;
+}
+
+.Recommend{
+  background-color: #993399;
+  border-color: #993399;
 }
 
 .Normal{

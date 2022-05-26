@@ -43,10 +43,12 @@
                 :visible="successVisible"
                 :confirm-loading="confirmLoading"
                 @ok="handleOk"
-                @cancel="handleCancel"
+                
                 okText="确认"
-                cancelText="等一下再过去"
+                
                 >
+                <!-- @cancel="handleCancel"
+                  cancelText="等一下再过去" -->
                 <a-result
                   status="success"
                   title="欢迎来到Let\'s code!"
@@ -110,9 +112,11 @@
         this.successVisible=false;
         this.$router.push({path:"/login"});
       },
+      /*
       handleCancel(){
         this.successVisible=false;
       },
+      */
       showSuccess(){
         this.successVisible=true;
         /*var se = this;

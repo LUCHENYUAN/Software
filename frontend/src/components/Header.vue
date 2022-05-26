@@ -3,11 +3,13 @@
         <div @click ="toIndex" class="top-logo" />
         
         <a-menu mode="horizontal"  v-model="current" :style="{ lineHeight: '64px' }" class="header-menu">
-          <cSearch class="search"/>
+          
           <a-menu-item key="index" @click = "toIndex">首页</a-menu-item>
           <a-menu-item key="calendar" @click = "toCalendar">日程</a-menu-item>
           <a-menu-item key="subscribe" @click = "toSubscribe">订阅</a-menu-item>
-          <!--a-menu-item key="book" @click = "toBook">书籍</-a-menu-item>
+          <a-menu-item key="discussion" @click = "toDiscussion">讨论</a-menu-item>
+          <!--cSearch class="search"/>
+          <a-menu-item key="book" @click = "toBook">书籍</-a-menu-item>
           <a-menu-item key="movie" @click = "toMovie">影视</a-menu-item>
           <a-menu-item key="group" @click = "toGroup">小组</a-menu-item>
           <a-menu-item-- key="topic" @click = "toTopic">话题</a-menu-item-->
@@ -75,12 +77,14 @@
 
 <script>
 import global_ from '../components/Global';
-import cSearch from '../components/Search.vue';
+//import cSearch from '../components/Search.vue';
 import Bus from '../bus.js'
 export default {
+  /*
   components:{
     cSearch
   },
+  */
   data() {
     return {
       showLogin:true,//控制注册登录按钮和按钮菜单的出现
@@ -91,23 +95,33 @@ export default {
   },
   created: function(){
     document.title = this.$route.meta.title || this.$route.meta.pathName
-    console.log(global_.token);
+    //console.log(global_.token);
     console.log('head has been created');
-    this.username=global_.username;
-    this.token=global_.token;
+    //this.username=global_.username;
+    //this.token=global_.token;
+    this.username = localStorage.getItem('username');
+    this.token = localStorage.getItem('token');
+    this.showLogin = !localStorage.getItem('loginStatus');
 
+    /*这里迟早要修，刷新之后光标不在对应页上 */
     Bus.$on('current',target=>{
       console.log(target);
-      this.current=target;
+    
+    console.log(this.current);
     })
   },
   computed:{
     token_head:function(){
-      console.log(global_.token!='');
-      return this.global_.token;
+      //console.log(global_.token!='');
+      //return this.global_.token;
+      let token = localStorage.getItem('token');
+      console.log(token!='')
+      return token;
     },
     username_head:function(){
-      return global_.username;
+      let username  = localStorage.getItem('username');
+      return username;
+      //return global_.username;
     }
   },
   watch:{
@@ -115,14 +129,17 @@ export default {
       document.title = this.$route.meta.title || this.$route.meta.pathName
     },
     current:function(){
-      this.username=global_.username;
-      this.token=global_.token;
+      //this.username=global_.username;
+      //this.token=global_.token;
+      this.username = localStorage.getItem('username');
+      this.token = localStorage.getItem('token')
+      
       console.log(this.current);
-      console.log(this.username);
+      //console.log(this.username);
     },
     token:function(newval){
       console.log('环境改变');
-      if(newval=='')
+      if(newval==null)
         this.showLogin=true;
       else
         this.showLogin=false;
@@ -139,16 +156,20 @@ export default {
       this.toUserindex();
     },
     exit(){
+      console.log("exit clicked")
+      localStorage.clear();
+      this.token='';
       this.showLogin=true;
-      global_.token='';
+      
       global_.username='not login';
       global_.loginStatus=false;
-      this.toIndex();
-
+      console.log(this.showLogin);
+      //this.toIndex();
+      this.toLogin();
     },
     toIndex(){
-      this.current='index';
-      this.$router.push({path:"/"});
+        this.current='index';
+        this.$router.push({path:"/"});
     },
     toCalendar(){
       this.current='calendar';
