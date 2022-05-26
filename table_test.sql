@@ -100,3 +100,14 @@ foreign key(user_id) references User(user_id),
 foreign key(game_id) references Game(game_id)
 );
 
+#info表
+create table letscode.info
+(
+    info_id     int(11) auto_increment
+        primary key,
+    user_id     int(11)     default 0                 null,
+    content     varchar(100)                       null,
+    headline    varchar(20)                        not null,
+    create_time datetime default CURRENT_TIMESTAMP null
+)
+
