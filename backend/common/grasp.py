@@ -65,8 +65,8 @@ def job():
             print('add-success')
             newList.append(i)
     return newList
-    # savepath = ".\\初步收集赛事信息.xls"
-    # saveData(savepath, datalist)
+    savepath = ".\\初步收集赛事信息.xls"
+    saveData(savepath, datalist)
 
 
 
@@ -81,9 +81,11 @@ def job():
 # sql = "select * from game where game_name="
 
 
+
 def getDataLuogu(baseurl):
     datalist = []
     driver_path = r"C:\Program Files\Google\Chrome\Application\chromedriver.exe"
+
     s = selenium.webdriver.chrome.service.Service(driver_path)
     options = Options()
     options.add_argument('-headless')
@@ -97,7 +99,7 @@ def getDataLuogu(baseurl):
     info = soup.find_all('div', class_="row")
     for item in info:
         item = str(item).replace('\n', '')
-        # print(item)
+        #print(item)
         getStatus = re.compile(r'<span class="status".*?>(.*?)</span>')
         status = re.findall(getStatus, item)[0].strip()
         if status == "已结束":
@@ -115,13 +117,15 @@ def getDataLuogu(baseurl):
         times = re.findall(findTime, item)
         start = "2022-" + times[0]
         end = date + " " + times[1]
-        if re.findall('Div.\d', name):
-            diff = re.findall('Div.\d', name)[0]
-        elif re.findall('普及组', name):
-            diff = '普及组'
+        if re.findall('Div\.1', name):
+            level = 4
         else:
-            diff = ''
-        # 模拟点击获取链接
+            level = 3
+        if re.findall('普及组', name):
+            type = '普及组'
+        else:
+            type = ''
+        #模拟点击获取链接
         element = browser.find_element(by=By.LINK_TEXT, value=name)
         ActionChains(browser).move_to_element(element).perform()
         element.click()
@@ -136,9 +140,12 @@ def getDataLuogu(baseurl):
         data.append('')
         data.append(1)
         data.append(link)
-        data.append(diff)
-        data.append('')
+        data.append(type)
+        data.append(level)
         data.append('洛谷')
+        data.append('')
+        data.append(0)
+        data.append(1)
         datalist.append(data)
 
     browser.quit()
@@ -169,11 +176,18 @@ def getDataNewCoder(baseurl):
         for i in range(0, len(end)):
             if i % 2 == 1:
                 trueEnd.append(end[i])
-        # length = re.findall(findLength, item)
-        # minutelabel = length.find("分钟")
-        # hourlabel = length.find("小时")
-        # if minutelabel != -1:
-        #     length = length[0:hourlabel] + ":" + length[hourlabel+4:minutelabel]
+        length = re.findall(findLength, item)[0]
+        if '天' in length:
+            level = 5
+        else:
+            hourlabel = length.find('小时')
+            if '0' <= length[hourlabel-2] <= '9':
+                level = 5
+            elif '0' <= length[hourlabel-1] <= '2':
+                level = 2
+            else:
+                level = 5
+
         diff = re.findall(findDiff, item)
         data.append(name[0])
         data.append(start[0])
@@ -192,16 +206,20 @@ def getDataNewCoder(baseurl):
             data.append('')
         else:
             data.append(diff[0])
-        data.append('')
+        data.append(level)
         data.append('牛客网')
+        data.append('')
+        data.append(0)
+        data.append(1)
         datalist.append(data)
-    # print(datalist)
+    #print(datalist)
     return datalist
 
 
 def getDataLeetCode(baseurl):
     datalist = []
     driver_path = r"C:\Program Files\Google\Chrome\Application\chromedriver.exe"
+
     s = selenium.webdriver.chrome.service.Service(driver_path)
     options = Options()
     options.add_argument('-headless')
@@ -234,14 +252,21 @@ def getDataLeetCode(baseurl):
     data1.append("https://leetcode-cn.com/contest/" + link)
     if '双周赛' in name:
         data1.append('双周赛')
+        data1.append(2)
     elif '周赛' in name:
         data1.append('周赛')
+        data1.append(1)
     elif '专场竞赛' in name:
         data1.append('专场竞赛')
+        data1.append(3)
     else:
         data1.append('其他')
-    data1.append('')
+        data1.append(3)
+
     data1.append('LeetCode力扣')
+    data1.append('')
+    data1.append(0)
+    data1.append(1)
     datalist.append(data1)
     info = str(soup.find_all('div', class_="contest-card-base col-sm-5 col-xs-6")[0])
     findLink = re.compile(r'a href="/contest/(.*?)"')
@@ -263,16 +288,23 @@ def getDataLeetCode(baseurl):
     data2.append("https://leetcode-cn.com/contest/" + link)
     if '双周赛' in name:
         data2.append('双周赛')
+        data2.append(2)
     elif '周赛' in name:
         data2.append('周赛')
+        data2.append(1)
     elif '专场竞赛' in name:
         data2.append('专场竞赛')
+        data2.append(3)
     else:
         data2.append('其他')
-    data2.append('')
+        data2.append(3)
+
     data2.append('LeetCode力扣')
+    data2.append('')
+    data2.append(0)
+    data2.append(1)
     datalist.append(data2)
-    # print(datalist)
+    #print(datalist)
     return datalist
 
 
@@ -280,25 +312,35 @@ def getDataAtCoder(baseurl):
     datalist = []
     html = askUrl(baseurl)
     soup = BeautifulSoup(html, features="html.parser")
-    # print(soup)
+    #print(soup)
     form = soup.find('div', id="contest-table-upcoming")
     info = form.find('tbody')
     for item in info.find_all('tr'):
         data = []
         item = str(item)
-        # print(item)
+        #print(item)
         findTD = re.compile(r'<td class="text-center">(.*?)</td>')
         TD = re.findall(findTD, item)
-        # print(TD)
+        #print(TD)
         length = TD[1]
         diff = 'AtCoder ' + TD[2]
         findStart = re.compile(r'<time class="fixtime fixtime-full">(.*?):00\+0900</time>')
         start = re.findall(findStart, TD[0])[0]
-        # print(start)
+        #print(start)
         findLink = re.compile(r'<a href="(.*?)">')
         link = "https://atcoder.jp" + re.findall(findLink, item)[1]
         findName = re.compile(r'<a href="/contests/.*">(.*?)</a>')
         name = re.findall(findName, item)[0]
+
+        if 'Beginner' in name:
+            level = 1
+        elif 'Regular' in name:
+            level = 3
+        elif 'Grand' in name:
+            level = 4
+        else:
+            level = 5
+
         data.append(name)
         data.append(start)
         data.append('')
@@ -306,9 +348,12 @@ def getDataAtCoder(baseurl):
         data.append(1)
         data.append(link)
         data.append(diff)
-        data.append('')
+        data.append(level)
         data.append('AtCoder')
-        # print(data)
+        data.append('')
+        data.append(0)
+        data.append(1)
+        #print(data)
         datalist.append(data)
 
     return datalist
@@ -329,6 +374,7 @@ def getDataCodeForces(baseurl):
     #     print(soup)
     datalist = []
     driver_path = r"C:\Program Files\Google\Chrome\Application\chromedriver.exe"
+
     s = selenium.webdriver.chrome.service.Service(driver_path)
     options = Options()
     options.add_argument('-headless')
@@ -347,10 +393,10 @@ def getDataCodeForces(baseurl):
             continue
         data = []
         item = str(item).strip()
-        # print(item)
+        #print(item)
         findLink = re.compile(r'<tr data-contestid="(.*?)">')
         link = "https://codeforces.com/contests/" + re.findall(findLink, item)[0]
-        # print(link)
+        #print(link)
         findTD = re.compile(r'<td.*?>(.*?)</td>', re.S)
         TD = re.findall(findTD, item)
         TD[2] = TD[2].replace('\n', '')
@@ -359,8 +405,8 @@ def getDataCodeForces(baseurl):
         startDay = re.findall('.*?>.*?/(.*?)/.*?<sup.*', TD[2])[0].strip()
         startYear = re.findall('.*?>.*?/.*?/(.*?) .*?:.*<sup.*', TD[2])[0].strip()
         startTime = re.findall('.*?>.*?/.*?/.*? (.*?)<sup.*', TD[2])[0].strip()
-        Monthdict = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
-                     "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
+        Monthdict = {"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", "May":"05", "Jun":"06",
+                    "Jul":"07", "Aug":"08", "Sep":"09", "Oct":"10", "Nov":"11", "Dec":"12"}
         start = startYear + "-" + Monthdict[startMonth] + "-" + startDay + " " + startTime
         end = ""
         length = TD[3].strip()
@@ -368,6 +414,18 @@ def getDataCodeForces(baseurl):
             diff = ''
         else:
             diff = re.findall("(Div. \d)", name)[0]
+
+        if 'Div. 1' in name:
+            level = 4
+        elif 'Div. 2' in name:
+            level = 3
+        elif 'Div. 3' in name:
+            level = 2
+        elif 'Div. 4' in name:
+            level = 1
+        else:
+            level = 5
+
         data.append(name)
         data.append(start)
         data.append(end)
@@ -375,12 +433,18 @@ def getDataCodeForces(baseurl):
         data.append(1)
         data.append(link)
         data.append(diff)
-        data.append('')
+        data.append(level)
         data.append('CodeForces')
+        data.append('')
+        data.append(0)
+        data.append(1)
         datalist.append(data)
-        # print(datalist)
+        #print(datalist)
 
     return datalist
+
+
+
 
 
 # 获取一个指定的URL的网页内容，用于静态网页爬取

@@ -31,16 +31,19 @@ def register():
 @user.route('/login',methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        name = request.json['name']
-        password = request.json['password']
+        # name = request.json['name']
+        # password = request.json['password']
+        name = request.form.get('name')
+        password = request.form.get('password')
         user = User().get_by_username(name)[0]
-        print(user)
+        print(user.__dict__)
         if not user:
             return {"info": "no such user", "code": 1}, 400
         print(user.password)
         print(type(password))
         print(check_password_hash(user.password,password))
-        if not check_password_hash(user.password,password):
+        if user.password!=password:
+        # if not check_password_hash(user.password,password):
             return {"info": "wrong password", "code": 2}, 400
         print(user)
         session['isLogin'] = 'true'
@@ -48,6 +51,7 @@ def login():
         session['user_name'] = name
         session['type'] = user.user_type
         token = user.user_id
+
         return {"info": "success", "code": 0, 'result': {'token': token}}
 
 @user.route("/logout")
@@ -73,18 +77,18 @@ def modify():
     res=user.get_by_username(user_name1)
 
     if res==None:
-        return 'user-non-exist'  #用户不存在
+        return {"info": "error" ,"code": 2} #2为用户不存在
     else:
-        return user.modify_info(user_name1,user_name2,password,mail,preferrence,phone)
+        return user.modify_info(user_name1,user_name2,password,mail,preferrence,phone) #1为修改失败 ，0为修改成功
 
 
 @user.route('/info')
 def show_info():
-    islogin=session.get('islogin')
-    if islogin!=True:
-        return 'non-login'
+    u_id=request.json['user_id']
+    if u_id==None:
+        return {"info": "error" ,"code": 0} #未等录
 
-    user_name=session.get('user_name')
+    user_name=request.json['user_name']
     user=User().get_by_username(user_name)
     dict={}
     for k,v in user.__dict__.items():
@@ -99,14 +103,14 @@ def set_send():
     send_time=request.form.get('send_time').strip()
     send_way=request.form.get('send_way').strip()
 
-    user_id=session.get('user_id')
+    user_id=request.json['user_id']
     try:
         dbsession.query(User).filter_by(user_id=user_id).update({'send_time':send_time})
         dbsession.query(User).filter_by(user_id=user_id).update({'send_way':send_way})
         dbsession.commit()
-        return 'set-sucess'
+        return {"info": "success" ,"code": 0}
     except:
-        return 'set-fail'
+        return {"info": "error" ,"code": 1} #修改失败
 
 
 

@@ -49,9 +49,9 @@ class User(DBase):
         try:
             dbsession.query(User).filter_by(user_name=user_name1).updata(data)
             dbsession.commit()
-            return 'modify-success'
+            return  {"info": "success" ,"code": 0}
         except:
-            return 'modify-fail'
+            return {"info": "error" ,"code": 1}
 
 
 

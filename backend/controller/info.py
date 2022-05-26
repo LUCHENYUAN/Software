@@ -7,7 +7,7 @@ info = Blueprint('info', __name__)
 
 @info.route('/infoall')
 def show_info():
-    res=Info().get_info_by_user(session.get('user_id'))
+    res=Info().get_info_by_user(request.json['user_id'])
     res+=Info().get_info_by_user(0)
 
     list=[]

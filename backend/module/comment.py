@@ -17,7 +17,7 @@ class Comment(DBase):
     def insert_comment(self, post_id, content, ipaddr):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
 
-        comment = Comment(user_id=session.get('user_id'), user_name=session.get('user_name'), post_id=post_id,
+        comment = Comment(user_id=request.json['user_id'], user_name=request.json['user_name'], post_id=post_id,
                           content=content,
                           ipaddr=ipaddr, create_time=now, reply_id=0)
         dbsession.add(comment)
@@ -30,7 +30,7 @@ class Comment(DBase):
 
     def insert_reply(self, post_id, comment_id, content, ipaddr):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
-        comment = Comment(user_id=session.get('user_id'), user_name=session.get('user_name'), post_id=post_id,
+        comment = Comment(user_id=request.json['user_id'], user_name=request.json['user_name'], post_id=post_id,
                           content=content, ipaddr=ipaddr, reply_id=comment_id,
                           create_time=now,
                           )

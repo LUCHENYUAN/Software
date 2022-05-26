@@ -11,17 +11,17 @@ def add():
     ipaddr=request.remote_addr
 
     if content==None or content=='' or len(content)>200:
-        return 'content-invalid'
+        return {"info": "error" ,"code": 1} #评论内容不正确
 
-    if session.get('islogin') != 'true':
-        return 'not-login'
+    if request.json['user_id']==None:
+        return {"info": "error" ,"code": 2} #未登录
 
     comment=Comment()
     try:
         comment.insert_comment(post_id,content,ipaddr)
-        return 'add-pass'
+        return {"info": "success" ,"code": 0}
     except:
-        return 'add-fail'
+        return {"info": "error" ,"code": 3} #新增失败
 
 @comment.route('/reply',methods=['POST'])
 def reply():
@@ -32,18 +32,18 @@ def reply():
 
     #评论字数限制
     if content==None or content=='' or len(content)>200:
-        return 'content-invalid'
+        return {"info": "success" ,"code": 2} #内容有错误
 
-    if session.get('islogin')!='true':
-        return 'not-login'
+    if request.json['user_id'] == None:
+        return {"info": "success" ,"code": 3} #未登录
 
     comment=Comment()
     try:
         comment.insert_reply(post_id=post_id,comment_id=comment_id,
                              content=content,ipaddr=ipaddr)
-        return 'reply-pass'
+        return {"info": "success" ,"code": 0} #回复成功
     except:
-        return 'reply-fail'
+        return {"info": "success" ,"code": 1} #回复失败
 
 #为了使用ajax分页
 #由于分页栏已经完成渲染，此接口仅根据前端的页码请求后台对应数据
