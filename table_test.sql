@@ -8,7 +8,7 @@ create table User
    user_name varchar(50) not null,
    user_type varchar(10) not null check(user_type in ('reg','admin') ) , #用户类型
    avatar varchar(20), #用户头像的地址
-   password varchar(32) not null,
+   password varchar(80) not null,
    mail varchar(30) not null,
    preferrence varchar(50) not null,
    gender varchar(6) not null check(gender in ('male','female')),
