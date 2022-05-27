@@ -17,23 +17,28 @@ class Reserve(DBase):
     def update_reserve(self):
         dbsession.add(self)
         dbsession.commit()
+        dbsession.close()
         return
 
     def delete_reverse(self):
         dbsession.query(Reserve).filter_by(reserve_id=self.reserve_id).delete()
         dbsession.commit()
+        dbsession.close()
         return
 
     def get_by_id(self,r_id):
         reserve = dbsession.query(Reserve).filter_by(reserve_id=r_id).all()
+        dbsession.close()
         return reserve
 
     def get_by_user(self,u_id):
         reserve = dbsession.query(Reserve).filter_by(user_id=u_id).all()
+        dbsession.close()
         return reserve
 
     def get_by_user_and_game(self,u_id, g_id):
         reserve = dbsession.query(Reserve).filter_by(user_id=u_id, game_id=g_id).all()
+        dbsession.close()
         return reserve
 
 

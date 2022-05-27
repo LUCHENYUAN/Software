@@ -63,5 +63,5 @@ def reserve_delete():
 
     m_reserve = dbsession.query(User).filter_by(user_name=username, game_name=g_name)
     m_reserve.delete_reverse()
-
+    dbsession.close()
     return

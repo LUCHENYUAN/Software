@@ -22,10 +22,12 @@ class Comment(DBase):
                           ipaddr=ipaddr, create_time=now, reply_id=0)
         dbsession.add(comment)
         dbsession.commit()
+        dbsession.close()
 
     # 根据文章编号查看所有评论
     def get_by_postid(self, post_id):
         result = dbsession.query(Comment).filter_by(post_id=post_id, hidden=0, reply_id=0).all()
+        dbsession.close()
         return result
 
     def insert_reply(self, post_id, comment_id, content, ipaddr):
@@ -36,6 +38,7 @@ class Comment(DBase):
                           )
         dbsession.add(comment)
         dbsession.commit()
+        dbsession.close()
 
         # 查找评论与用户信息，注意评论区也要分页
 
@@ -43,17 +46,20 @@ class Comment(DBase):
         res = dbsession.query(Comment, User).join(User, User.user_id == Comment.user_id) \
             .filter(Comment.post_id == post_id, Comment.hidden == 0) \
             .order_by(Comment.comment_id.desc()).limit(count).offset(start).all()
+        dbsession.close()
         return res
 
     def get_comment_with_user(self, post_id, start, count):
         res = dbsession.query(Comment, User).join(User, User.user_id == Comment.user_id) \
             .filter(Comment.post_id == post_id, Comment.hidden == 0, Comment.reply_id == 0) \
             .order_by(Comment.comment_id.desc()).limit(count).offset(start).all()
+        dbsession.close()
         return res
 
     def get_reply_with_user(self, reply_id):
         res = dbsession.query(Comment, User.user_name).join(User, User.user_id == Comment.user_id) \
             .filter(Comment.hidden == 0, Comment.reply_id == reply_id).all()
+        dbsession.close()
         return res
 
     def get_comment_user_list(self, post_id, start, count):
@@ -83,6 +89,7 @@ class Comment(DBase):
 
     def get_count_by_postid(self, post_id):
         count = dbsession.query(Comment).filter_by(post_id=post_id, hidden=0, reply_id=0).count()
+        dbsession.close()
         return count
 
 

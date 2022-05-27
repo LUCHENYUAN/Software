@@ -5,7 +5,7 @@ from module.info import *
 from datetime import datetime
 info = Blueprint('info', __name__)
 
-@info.route('/infoall')
+@info.route('/info/infoall')
 def show_info():
     res=Info().get_info_by_user(request.json['user_id'])
     res+=Info().get_info_by_user(0)

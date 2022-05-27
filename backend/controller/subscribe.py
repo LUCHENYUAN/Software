@@ -75,6 +75,7 @@ def update_subscribe():
 
     username = request.form.get("username").strip()
     u_id = dbsession.query(User).filter_by(user_name=username)
+    dbsession.close()
 
     m_subscribe.user_id = u_id
     m_subscribe.game_type = request.form.get("game_type").strip()
@@ -91,6 +92,7 @@ def delete_subscribe():
 
     username = request.form.get("username").strip()
     u_id = dbsession.query(User).filter_by(user_name=username)
+    dbsession.close()
 
     m_subscribe.user_id = u_id
     m_subscribe.game_type = request.form.get("game_type").strip()

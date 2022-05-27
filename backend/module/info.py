@@ -10,4 +10,14 @@ class Info(DBase):
 
     def get_info_by_user(self,user_id):
         res=dbsession.query(Info).filter(Info.user_id==user_id).all()
+        dbsession.close()
         return res
+
+    def add(self):
+        dbsession.add(self)
+        dbsession.commit()
+        dbsession.close()
+    def rm(self):
+        dbsession.delete(self)
+        dbsession.commit()
+        dbsession.close()

@@ -104,3 +104,8 @@ def model_join_list(result):
     return list
 
 
+if __name__=='__main__':
+    str='洛谷,LeetCode力扣,牛客网,AtCoder,CodeForces'
+    print(len(str))
+
+

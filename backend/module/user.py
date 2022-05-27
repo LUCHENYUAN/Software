@@ -1,5 +1,6 @@
 from sqlalchemy import Table
 from common.database import dbconnect
+
 import time
 
 dbsession,md,DBase=dbconnect()
@@ -11,20 +12,31 @@ class User(DBase):
     def add(self):
         dbsession.add(self)
         dbsession.commit()
+        dbsession.close()
     def rm(self):
         dbsession.delete(self)
         dbsession.commit()
+        dbsession.close()
+
 
     def get_by_username(self, name):
         res = dbsession.query(User).filter_by(user_name=name).all()
+        dbsession.close()
+        return res
+
+    def get_by_id(self, id):
+        res = dbsession.query(User).filter_by(user_id=id).first()
+        dbsession.close()
         return res
 
     def get_by_phone(self,phone):
         res = dbsession.query(User).filter_by(phone=phone).first()
+        dbsession.close()
         return res
 
     def get_by_mail(self,mail):
         res = dbsession.query(User).filter_by(mail=mail).first()
+        dbsession.close()
         return res
 
 
@@ -47,11 +59,38 @@ class User(DBase):
             data['phone'] = phone
 
         try:
-            dbsession.query(User).filter_by(user_name=user_name1).updata(data)
+            dbsession.query(User).filter_by(user_name=user_name1).update(data)
             dbsession.commit()
+            dbsession.close()
             return  {"info": "success" ,"code": 0}
         except:
             return {"info": "error" ,"code": 1}
+
+
+
+    #以下内容只有管理员才有权限操作
+    #禁用该用户的权限
+    def set_user_black(self,user_id):
+        data={'black':1}
+        try:
+            dbsession.query(User).filter_by(user_id=user_id).update(data)
+            dbsession.commit()
+            dbsession.close()
+            return {"info": "success" ,"code": 0}
+        except:
+            return {"info": "error", "code": 1}
+
+    # 恢复该用户的权限
+    def set_user_white(self,user_id):
+        data={'black':0}
+        try:
+            dbsession.query(User).filter_by(user_id=user_id).update(data)
+            dbsession.commit()
+            dbsession.close()
+            return {"info": "success" ,"code": 0}
+        except:
+            return {"info": "error", "code": 1}
+
 
 
 
