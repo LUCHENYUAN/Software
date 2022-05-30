@@ -1,6 +1,6 @@
 <template>
   <div id="app" style="display:flex;flex-direction:column;">
-    <AppHeader></AppHeader>
+    <AppHeader :isLogin="isLogin" :userName="userName"></AppHeader>
     <router-view style="text-align: center;margin-top:4px;flex:1;"/>
     <AppFooter></AppFooter>
   </div>
@@ -27,10 +27,17 @@ export default {
   },
   data() {
     return {
+      isLogin: false,
+      userName:'',
     }
   },
   created: function(){
     document.title = this.$route.meta.title || this.$route.meta.pathName
+  },
+  updated: function() {
+    this.isLogin = sessionStorage.getItem('loginStatus');
+    this.userName = sessionStorage.getItem('userName');
+    //console.log('=== updated', this.isLogin, this.userName);
   },
   watch:{
     $route(){

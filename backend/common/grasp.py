@@ -25,7 +25,10 @@ import xlwt  # 进行excel操作
 import pymysql
 from http import cookiejar
 
-from module.game import Game
+from module.game import Game, dbsession
+from module.user import User
+from module.info import Info
+from common.utility import *
 
 
 def job():
@@ -54,8 +57,16 @@ def job():
     newList=[]
     for i in datalist:
         try:
-            game = Game(game_name=i[0], game_start_time=i[1], game_end_time=i[2], duration=i[3], checked=1,
+            tmp1,tmp2=i[2],i[3]
+            if i[2]=='':
+                tmp1=None
+            if i[3]=='':
+                tmp2=None
+
+
+            game = Game(game_name=i[0], game_start_time=i[1], game_end_time=tmp1, duration=tmp2, checked=1,
                          website=i[5], game_type=i[6], level_=i[7], platform=i[8])
+            dbsession.rollback()
             game.add()
             print(i)
 
@@ -64,9 +75,20 @@ def job():
         else:
             print('add-success')
             newList.append(i)
+
+    #给每个用户发邮件，同时添加一条全体 消息
+    if newList !=[]:
+        users=User().get_all()
+        for i in users:
+            send_email(i.__dict__['mail'],"赛事信息已更新，新的赛事已存入日历中")
+
+        info=Info(user_id=0,content='赛事信息已更新，请立刻去相关界面查看',headline='赛事更新')
+        info.add()
+
+
     return newList
-    savepath = ".\\初步收集赛事信息.xls"
-    saveData(savepath, datalist)
+    # savepath = ".\\初步收集赛事信息.xls"
+    # saveData(savepath, datalist)
 
 
 

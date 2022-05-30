@@ -78,9 +78,10 @@
           global_.loginStatus=true;
           //console.log("Login Page: "+global_.token);
 
-          localStorage.setItem('token', res.data.result.token);
-          localStorage.setItem('username', self.username);
-          localStorage.setItem('loginStatus', true);
+          sessionStorage.setItem('token', res.data.result.token);
+          sessionStorage.setItem('userName', self.username);
+          sessionStorage.setItem('loginStatus', true);
+          
 
           self.startDivi();
         }).catch(function(error){

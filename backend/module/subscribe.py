@@ -23,7 +23,7 @@ class Subscribe(DBase):
         return
 
     def get_by_user_id(self,u_id):
-        subscribes = dbsession.query(Subscribe).filter_by(user_id=u_id).all()
+        subscribes = dbsession.query(Subscribe).filter_by(user_id=u_id).first()
         dbsession.close()
         return subscribes
 
@@ -42,3 +42,22 @@ class Subscribe(DBase):
         dbsession.close()
         return subscribes
 
+    def modify(self, platform=None, game_type=None, level_=None):
+        data = {}
+
+        if platform != None:
+            data['platform'] = platform
+
+        if game_type != None:
+            data['game_type'] = game_type
+
+        if level_ != None:
+            data['level_'] = level_
+
+        try:
+            dbsession.query(Subscribe).filter_by(subscribe_id=self.subscribe_id).update(data)
+            dbsession.commit()
+            dbsession.close()
+            return {"info": "success", "code": 0}
+        except:
+            return {"info": "error", "code": 1}

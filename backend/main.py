@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import pymysql
 from flask_cors import *
-
+from flask_mail import Mail
 
 
 pymysql.install_as_MySQLdb()  # 解决版本兼容性问题
@@ -14,9 +14,10 @@ app.config['SECRET_KEY'] = os.urandom(24)  # 产生sessionid
 # 跨域请求
 # CORS(app)
 
+
 # 使用集成方式连接处理sqlalchemy，建议大家密码都改成 commonpass
-# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root123@localhost:3306/letscode?charset=utf8"
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:commonpass@localhost:3306/letscode?charset=utf8"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root123@localhost:3306/letscode?charset=utf8"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:commonpass@localhost:3306/letscode?charset=utf8"
 
 app.config['SQLALCHEMY_POOL_SIZE']=100
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True # 跟踪数据库的修改，及时发送信号
@@ -25,6 +26,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 跟踪数据库的修改�
 db = SQLAlchemy(app)
 
 CORS(app,supports_credentials=True,resources={r"/*"})
+
+app.config.update(
+    MAIL_SERVER='smtp.qq.com',
+    MAIL_PORT=25,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME='1350963070@qq.com',
+    MAIL_PASSWORD='tkapkbixnfaxffcf',
+    MAIL_DEFAULT_SENDER=('Letscode', '1350963070@qq.com')
+)
+
+# 邮件
+mail = Mail(app)
 
 @app.errorhandler(404)
 def page_not_found(e):

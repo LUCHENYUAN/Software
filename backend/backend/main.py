@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = os.urandom(24)  # 产生sessionid
 # CORS(app)
 
 # 使用集成方式连接处理sqlalchemy，建议大家密码都改成 commonpass
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root123@localhost:3306/letscode?charset=utf8"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:commonpass@localhost:3306/letscode?charset=utf8"
 
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True # 跟踪数据库的修改，及时发送信号
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 跟踪数据库的修改，及时发送信号

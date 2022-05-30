@@ -10,7 +10,7 @@ create table User
    avatar varchar(20), #用户头像的地址
    password varchar(80) not null,
    mail varchar(30) not null,
-   preferrence varchar(50) not null defaule '无',
+   preferrence varchar(50) not null default '无',
    gender varchar(6) not null check(gender in ('male','female')) default 'male',
    phone varchar(11) not null,
    black tinyint not null default 0,
@@ -115,4 +115,5 @@ create table Info
     headline    varchar(20)   not null,
     create_time datetime default now()
 );
+
 

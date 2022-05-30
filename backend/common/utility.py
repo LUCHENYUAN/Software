@@ -58,8 +58,8 @@ from email.header import Header
 def send_email(receiver,ecode):
     sender='Foods&Sports<1193458126@qq.com>'
 
-    content=f"<br/>欢迎注册Foods&Sports，您的验证码为：<span style='color:red;font-size:20px;'>{ecode}</span>"\
-    "请尽快复制此验证码完成注册，感谢您的使用"
+    content=f"<br/>欢迎使用Letscode，<span style='color:red;font-size:20px;'>{ecode}</span>"\
+    "请尽快去主页查看详情"
     #实例化邮件对象，并制定关键参数
     message=MIMEText(content,'html','utf-8')
     #指定邮件的标题

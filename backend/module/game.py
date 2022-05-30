@@ -105,3 +105,8 @@ class Game(DBase):
 # def get_game_by_platform(platform):
 #     res = dbsession.query(Game).filter_by(platform=platform).all()
 #     return res
+
+if __name__=='__main__':
+    res=Game().get_all()
+    for i in res:
+        print(i.__dict__['game_id'])

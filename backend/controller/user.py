@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from common.utility import *
 from module.game import Game
 from module.user import *
-
+from flask_mail import Message
+from main import mail
 user=Blueprint('user',__name__)
 
 
@@ -24,10 +25,26 @@ def register():
             return {"info": "email address occupied", "code": 3}, 400
         pwhash = generate_password_hash(password,method='pbkdf2:sha1', salt_length=8)
         print(pwhash)
-        user = User(user_name=name,password=pwhash, mail=email, phone=phonenum,user_type='reg')
+        user = User(user_name=name, password=pwhash, mail=email, phone=phonenum, user_type='reg', mail_confirmed=False)
         user.add()
+        #邮箱认证
+        subject = "邮箱验证-注册"
+        recipient = email
+        ##这里是后端的验证邮箱路由，带用户邮箱参数
+        url = "http://127.0.0.1:5000/confirmEmail?mail=" + str(email)
+        body = "<p>感谢您使用Letscode！</p> <a href=\"" + str(url) + "\" rel=\"bookmark\">请点击此链接，进行邮箱认证</a>"
+        mes = Message(subject=subject, recipients=[recipient], html=body)
+        mail.send(mes)
         return {"info": "success", "code": 0}
     return {"info": "waiting for request", "code": 0}
+
+@user.route('/confirmEmail',methods=['GET'])
+def confirmEmail():
+    email = request.args.get('mail')
+    user = User().get_by_mail(email)
+    user.modify(mail_confirmed=True)
+    return "邮箱验证成功，快去登录吧！"
+
 
 @user.route('/login',methods=['GET','POST'])
 def login():
@@ -36,7 +53,59 @@ def login():
         password = request.json['password']
 
         user = User().get_by_username(name)[0]
-        print(user.__dict__)
+        # print(user.__dict__)
+        if not user:
+            return {"info": "no such user", "code": 1}, 400
+        if not user.mail_confirmed:
+            return {"info": "mail not confirmed", "code": 3}, 400
+        print(user.password)
+        print(type(password))
+        print(check_password_hash(user.password,password))
+
+        if not check_password_hash(user.password,password):
+            return {"info": "wrong password", "code": 2}, 400
+        # print(user)
+        session['isLogin'] = 'true'
+        session['user_id'] = user.user_id
+        session['user_name'] = name
+        session['type'] = user.user_type
+        token = user.user_id
+
+        return {"info": "success", "code": 0, 'result': {'token': token}}
+
+@user.route('/loginByPhone',methods=['GET','POST'])
+def loginByPhone():
+    if request.method == 'POST':
+        phone = request.json['phone']
+        password = request.json['password']
+
+        user = User().get_by_phone(phone)[0]
+        # print(user.__dict__)
+        if not user:
+            return {"info": "no such user", "code": 1}, 400
+        print(user.password)
+        print(type(password))
+        print(check_password_hash(user.password,password))
+
+        if not check_password_hash(user.password,password):
+            return {"info": "wrong password", "code": 2}, 400
+        # print(user)
+        session['isLogin'] = 'true'
+        session['user_id'] = user.user_id
+        session['user_name'] = user.user_name
+        session['type'] = user.user_type
+        token = user.user_id
+
+        return {"info": "success", "code": 0, 'result': {'token': token}}
+
+@user.route('/loginByMail',methods=['GET','POST'])
+def loginByMail():
+    if request.method == 'POST':
+        mail = request.json['mail']
+        password = request.json['password']
+
+        user = User().get_by_mail(mail)[0]
+        # print(user.__dict__)
         if not user:
             return {"info": "no such user", "code": 1}, 400
         print(user.password)
@@ -48,11 +117,76 @@ def login():
         print(user)
         session['isLogin'] = 'true'
         session['user_id'] = user.user_id
-        session['user_name'] = name
+        session['user_name'] = user.user_name
         session['type'] = user.user_type
         token = user.user_id
 
         return {"info": "success", "code": 0, 'result': {'token': token}}
+
+@user.route('/changePassword',methods=['GET','POST'])
+def changePassword():
+    if request.method == 'POST':
+        token = request.json['token']
+        oripwd = request.json['oripwd']
+        newpwd = request.json['newpwd']
+
+        user = User().get_by_id(token)[0]
+        if not user:
+            return {"info": "no such user", "code": 1}, 400
+        if not check_password_hash(user.password,oripwd):
+            return {"info": "wrong original password", "code": 2}, 400
+        pwhash = generate_password_hash(newpwd, method='pbkdf2:sha1', salt_length=8)
+        user.modify(password=pwhash)
+        return {"info": "success", "code": 0}
+
+@user.route('/favicon.ico')
+def default():
+    return {}
+
+@user.route('/forgotPassword',methods=['GET','POST'])
+def forgotPassword():
+    if request.method == 'POST':
+        email = request.json['mail']
+        user = User().get_by_mail(email)
+        if not user:
+            return {"info": "no such user", "code": 1}, 400
+        subject = "邮箱验证-忘记密码"
+        recipient = email
+        ##这里是前端的重置密码界面的url，带用户邮箱参数
+        url = "http://127.0.0.1:8080/resetpwd?mail="+str(user.email)
+        body = "<p>感谢您使用Letscode！</p> <a href=\""+str(url)+"\" rel=\"bookmark\">请点击此链接，重置密码</a>"
+        mes = Message(subject=subject, recipients=[recipient], html=body)
+        mail.send(mes)
+        return {"info": "success", "code": 0}
+    # if request.method == 'GET':
+    #     email = request.args.get('mail')
+    #     print(email)
+    #     user = User().get_by_mail(email)
+    #     if not user:
+    #         return {"info": "no such user", "code": 1}, 400
+    #     subject = "邮箱验证-忘记密码"
+    #     recipient = email
+    #     ##这里是前端的重置密码界面的url，带用户邮箱参数
+    #     url = "http://127.0.0.1:8080/resetpwd?mail="+user.mail
+    #     body = "<p>感谢您使用Letscode！</p> <a href=\""+url+"\" rel=\"bookmark\">请点击此链接，重置密码</a>"
+    #     mes = Message(subject=subject, recipients=[recipient], html=body)
+    #     mail.send(mes)
+    #     return {"info": "success", "code": 0}
+
+#忘记密码邮箱验证后，不需要原密码
+@user.route('/resetPassword',methods=['GET','POST'])
+def resetPassword():
+    if request.method == 'POST':
+        email = request.json['email']
+        newpwd = request.json['newpwd']
+
+        user = User().get_by_mail(email)[0]
+        if not user:
+            return {"info": "no such user", "code": 1}, 400
+        pwhash = generate_password_hash(newpwd, method='pbkdf2:sha1', salt_length=8)
+        user.modify(password=pwhash)
+        return {"info": "success", "code": 0}
+
 
 @user.route("/logout")
 def logout():
@@ -65,7 +199,7 @@ def logout():
 
 # 修改个人信息
 @user.route('/alter',methods=['POST'])
-def modify():
+def alter():
     user_name1=request.form.get('user_name_old').strip()
     user_name2=request.form.get('user_name_new').strip()
     password=request.form.get('password').strip()

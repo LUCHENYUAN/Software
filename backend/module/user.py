@@ -39,8 +39,38 @@ class User(DBase):
         dbsession.close()
         return res
 
+    def modify(self,user_name=None,password=None,mail=None,preferrence=None,phone=None,mail_confirmed=None):
+        data = {}
 
-    def modify_info(self,user_name1,user_name2,password,mail,preferrence,phone):
+        if user_name != None:
+            data['user_name'] = user_name
+
+        if password != None:
+            data['password'] = password
+
+        if mail != None:
+            data['mail'] = mail
+
+        if preferrence != None:
+            data['preferrence'] = preferrence
+
+        if phone != None:
+            data['phone'] = phone
+
+        if mail_confirmed != None:
+            data['mail_confirmed'] = mail_confirmed
+
+        try:
+            dbsession.query(User).filter_by(user_id = self.user_id).update(data)
+            # self.update(data)
+            dbsession.commit()
+            dbsession.close()
+            return  {"info": "success" ,"code": 0}
+        except:
+            return {"info": "error" ,"code": 1}
+
+
+    def modify_info(self,user_name1=None,user_name2=None,password=None,mail=None,preferrence=None,phone=None,mail_confirmed=None):
         data = {}
 
         if user_name2 != None:
@@ -57,6 +87,9 @@ class User(DBase):
 
         if phone != None:
             data['phone'] = phone
+
+        if mail_confirmed != None:
+            data['mail_confirmed'] = mail_confirmed
 
         try:
             dbsession.query(User).filter_by(user_name=user_name1).update(data)

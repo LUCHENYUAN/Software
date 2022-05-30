@@ -4,23 +4,23 @@
         
         <a-menu mode="horizontal"  v-model="current" :style="{ lineHeight: '64px' }" class="header-menu">
           
-          <a-menu-item key="index" @click = "toIndex">首页</a-menu-item>
-          <a-menu-item key="calendar" @click = "toCalendar">日程</a-menu-item>
-          <a-menu-item key="subscribe" @click = "toSubscribe">订阅</a-menu-item>
-          <a-menu-item key="discussion" @click = "toDiscussion">讨论</a-menu-item>
+          <a-menu-item key="Home" @click = "toIndex">首页</a-menu-item>
+          <a-menu-item key="Calendar" @click = "toCalendar">赛事</a-menu-item>
+          <a-menu-item key="Subscribe" @click = "toSubscribe">订阅</a-menu-item>
+          <a-menu-item key="Discussion" @click = "toDiscussion">讨论</a-menu-item>
           <!--cSearch class="search"/>
           <a-menu-item key="book" @click = "toBook">书籍</-a-menu-item>
           <a-menu-item key="movie" @click = "toMovie">影视</a-menu-item>
           <a-menu-item key="group" @click = "toGroup">小组</a-menu-item>
           <a-menu-item-- key="topic" @click = "toTopic">话题</a-menu-item-->
           
-            <a-button type="primary" size="small" @click="toRegister" style="margin-left:10px" v-if="showLogin">
+            <a-button type="primary" size="small" @click="toRegister" style="margin-left:10px" v-if="!isLogin && showLogin">
               注册
             </a-button>
-            <a-button type="primary" size="small" @click="toLogin" style="margin-left:15px;margin-right:48px" v-if="showLogin">
+            <a-button type="primary" size="small" @click="toLogin" style="margin-left:15px;margin-right:48px" v-if="!isLogin && showLogin">
               登录
             </a-button>
-            <a-dropdown v-if="!showLogin">
+            <a-dropdown v-if="isLogin || !showLogin">
               <a-menu slot="overlay">
                 <a-menu-item key="1" @click="toUserindex">
                   个人主页
@@ -29,7 +29,7 @@
                   退出
                 </a-menu-item>
               </a-menu> 
-              <a-button type="link" @click="toUserindex"> 欢迎回来，{{username}}。 <a-icon type="down" /> </a-button>
+              <a-button type="link" @click="toUserindex"> 欢迎回来，{{userName}}。 <a-icon type="down" /> </a-button>
             </a-dropdown>
             <!--a-sub-menu key="topic" v-if="showExit">
               <span>
@@ -78,61 +78,69 @@
 <script>
 import global_ from '../components/Global';
 //import cSearch from '../components/Search.vue';
-import Bus from '../bus.js'
+//import Bus from '../bus.js'
 export default {
   /*
   components:{
     cSearch
   },
   */
+  props: ['isLogin','userName'],
   data() {
     return {
       showLogin:true,//控制注册登录按钮和按钮菜单的出现
       current: ['index'],
-      username:"",
-      token:''
+      // username:"",
+      token:'',
     };
   },
   created: function(){
     document.title = this.$route.meta.title || this.$route.meta.pathName
+    
+    
     //console.log(global_.token);
     console.log('head has been created');
     //this.username=global_.username;
     //this.token=global_.token;
-    this.username = localStorage.getItem('username');
+    /* this.username = localStorage.getItem('username');
     this.token = localStorage.getItem('token');
-    this.showLogin = !localStorage.getItem('loginStatus');
+    this.showLogin = !localStorage.getItem('loginStatus'); */
 
     /*这里迟早要修，刷新之后光标不在对应页上 */
-    Bus.$on('current',target=>{
-      console.log(target);
+    //Bus.$on('current',target=>{
+    // console.log(target);
+    // )}
     
-    console.log(this.current);
-    })
+    console.log('=== Header created', this.current);
+
+  },
+  updated: function() {
   },
   computed:{
     token_head:function(){
       //console.log(global_.token!='');
       //return this.global_.token;
-      let token = localStorage.getItem('token');
+      let token = sessionStorage.getItem('token');
       console.log(token!='')
       return token;
     },
     username_head:function(){
-      let username  = localStorage.getItem('username');
+      let username  = sessionStorage.getItem('username');
       return username;
       //return global_.username;
     }
   },
   watch:{
     $route(){
+      console.log('=== routeName updated', this.$route.name);
+      this.current = this.$route.name;
       document.title = this.$route.meta.title || this.$route.meta.pathName
     },
     current:function(){
       //this.username=global_.username;
       //this.token=global_.token;
-      this.username = localStorage.getItem('username');
-      this.token = localStorage.getItem('token')
+      //this.username = localStorage.getItem('username');
+      this.token = sessionStorage.getItem('token')
       
       console.log(this.current);
       //console.log(this.username);
@@ -157,7 +165,7 @@ export default {
     },
     exit(){
       console.log("exit clicked")
-      localStorage.clear();
+      sessionStorage.clear();
       this.token='';
       this.showLogin=true;
       
@@ -168,31 +176,34 @@ export default {
       this.toLogin();
     },
     toIndex(){
-        this.current='index';
+        this.current='Home';
         this.$router.push({path:"/"});
     },
     toCalendar(){
-      this.current='calendar';
+      this.current='Calendar';
       this.$router.push({path:"/calendar"});
     },
     toDiscussion(){
-      this.current='discussion';
+      this.current='Discussion';
       this.$router.push({path:"/discussion"});
     },
     toSubscribe(){
-      this.current='subscribe';
+      this.current='Subscribe';
       this.$router.push({path:"/subscribe"});
     },
     toRegister(){
-      this.current='register';
+      this.current='Register';
       this.$router.push({path:"/register"});
     },
     toLogin(){
-      this.current='login';
+      this.current='Login';
       this.$router.push({path:"/login"});
     },
-    /*
+    
     toUserindex(){
+      return null;
+    }
+      /*
       this.current='login';
       this.$router.push({
         path:"/user/index",
@@ -200,6 +211,7 @@ export default {
           token:global_.token
         }});
     },
+    
     toUserChange(){
       this.current='login';
     }*/
